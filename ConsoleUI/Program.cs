@@ -11,7 +11,28 @@ namespace ConsoleUI
     {
         static void Main(string[] args)
         {
-            ProductManager productManager = new ProductManager( new EFProductDal());
+            //DTO = Data Transformation Object
+            //IoC
+
+            ProductTest();
+            //CategoryTest();
+
+
+        }
+
+        private static void CategoryTest()
+        {
+            //IoC
+            CategoryManager categoryManager = new CategoryManager(new EfCategoryDal());
+            foreach (var category in categoryManager.GetAll())
+            {
+                Console.WriteLine(category.CategoryName);
+            }
+        }
+
+        private static void ProductTest()
+        {
+            ProductManager productManager = new ProductManager(new EFProductDal());
             //ProductManager productManager = new ProductManager(new InMemoryDal());
 
             //foreach (var product in productManager.GetAll())
@@ -19,15 +40,20 @@ namespace ConsoleUI
             //    Console.WriteLine(product.ProductName);
             //}
 
-            foreach (var product in productManager.GetAllByCategoryId(2))
-            {
-                Console.WriteLine(product.ProductName);
-            }
+            //foreach (var product in productManager.GetAllByCategoryId(2))
+            //{
+            //    Console.WriteLine(product.ProductName);
+            //}
 
             //foreach (var product in productManager.GetByUnitPrice(40,100))
             //{
             //    Console.WriteLine(product.ProductName);
             //}
+
+            foreach (var product in productManager.GetProductDetails())
+            {
+                Console.WriteLine(product.ProductName + "/" + product.CategoryName);
+            }
         }
     }
 }
