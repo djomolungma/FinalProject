@@ -1,10 +1,14 @@
 ﻿using Business.Abstract;
 using Business.Constants;
+using Business.ValidationRules.FluentValidation;
+using Core.Aspects.Autofac.Validation;
+using Core.CrossCuttingConserns.Validation;
 using Core.Utilities.Results;
 using DataAccess.Abstract;
 using DataAccess.Concrete.InMemory;
 using Entities.Concrete;
 using Entities.DTOs;
+using FluentValidation;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -21,19 +25,42 @@ namespace Business.Concrete
             _productDal = productDal;
         }
 
+        //3.Refactor edilmiş son kod
+        [ValidationAspect(typeof(ProductValidator))]
         public IResult Add(Product product)//Result döndürecek RestFull api de
         {
             //business codes
             //validations
-            if (product.ProductName.Length < 2)
-            {
-                //Antipatern == kötü kullanım
+            //businness kodu ayrı validation kodu ayrı yapılmalı !!!
 
-                //Magic strings
-                return new ErrorResult(Messages.ProductNameInvalid);
-            }
+
+            //1.kötü kod örneği
+            //if (product.UnitPrice <= 0)
+            //{
+            //    return new ErrorResult(Messages.UnitPriceInvalid);
+            //}
+            //if (product.ProductName.Length < 2)
+            //{
+            //    //Antipatern == kötü kullanım
+
+            //    //Magic strings
+            //    return new ErrorResult(Messages.ProductNameInvalid);
+            //}
+
+            //2.biraz daha iyi kod örneği spagetti
+            //var context = new ValidationContext<Product>(product);
+            //ProductValidator productValidator = new ProductValidator();
+            //var result = productValidator.Validate(context);
+            //if (!result.IsValid)
+            //{
+            //    throw new ValidationException(result.Errors);
+            //}
+
+            //3.Refactor edilmiş daha iyi kod örneği
+            //ValidationTool.Validate(new ProductValidator(), product);
+
             _productDal.Add(product);
-            
+
             return new SuccessResult(Messages.ProductAdded);
         }
 

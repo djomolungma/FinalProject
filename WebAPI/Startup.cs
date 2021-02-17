@@ -31,8 +31,12 @@ namespace WebAPI
         {
             services.AddControllers();
 
+            //Buradaki IoC yerine Manage nuget packages'dan Business katmanýna Autofac ve Autofac.Extras
+            //Autofac teknolojisini kuruyoruz "Autofac" ve "Autofac.Extras.DynamicProxy" yi kuruyoruz
 
-            //Autofac,Ninject,CastleWindsor,StructureMap,DryInject -->Ioc Container için yapýlardýr bunlardan birini kullanacaðýz
+            //Autofac,Ninject,CastleWindsor,StructureMap,LightInject,DryInject -->IoC Container için yapýlardýr bunlardan birini kullanacaðýz
+            //Postrsharp (ücretli bir IoC)
+
             //Net.core ile Autofac i kullanabiliriz (bize IoC container altyapýsý sunmakta)
             //Autofac bize AOP imkaný sunmakta ondan dolayý onu kullanacaðýz (2. ek çok kullanýlan Ninject)
 
@@ -40,11 +44,13 @@ namespace WebAPI
             //AOP bir methodun önünde, sonunda çalýþan kod parçalýklarýný AOP mimarisi ile vereceðiz
 
             //Biri constructorda IProductService isterse ProductManager() i new le ve ona ver !!!
-            services.AddSingleton<IProductService, ProductManager>();//Bana arka planda bir referans oluþtur IoC bizim yerine new ler
-            services.AddSingleton<IProductDal, EFProductDal>();
-            
+            //services.AddSingleton<IProductService, ProductManager>();//Bana arka planda bir referans oluþtur IoC bizim yerine new ler
+            //services.AddSingleton<IProductDal, EFProductDal>();
+
             //services.AddTransient - datalý referanslar için
             //services.AddScoped  - datalý referanslar için
+
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
