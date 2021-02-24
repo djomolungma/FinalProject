@@ -1,8 +1,10 @@
 ﻿using Business.Abstract;
+using Business.CCS;
 using Business.Constants;
 using Business.ValidationRules.FluentValidation;
 using Core.Aspects.Autofac.Validation;
 using Core.CrossCuttingConserns.Validation;
+using Core.Utilities.Business;
 using Core.Utilities.Results;
 using DataAccess.Abstract;
 using DataAccess.Concrete.InMemory;
@@ -11,6 +13,7 @@ using Entities.DTOs;
 using FluentValidation;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Business.Concrete
@@ -20,19 +23,39 @@ namespace Business.Concrete
         //Bir iş sınıfı başka sınıfları new lemez !!!
         //Business imn bildiği tek şey IProductDal !!! new yok
         IProductDal _productDal;
-        public ProductManager(IProductDal productDal)
+        ICategoryService _categoryService;
+        //ILogger _logger;
+
+        //public ProductManager(IProductDal productDal,ILogger logger)
+        //{
+        //    _productDal = productDal;
+        //    _logger = logger;
+        //}
+
+        //Bir entity manager kendidi hariç başka bir dal i enjekte edemez ****
+        public ProductManager(IProductDal productDal, ICategoryService categoryService)
         {
             _productDal = productDal;
+            _categoryService = categoryService;
         }
 
-        //3.Refactor edilmiş son kod
+        //4.Refactor edilmiş son kod
         [ValidationAspect(typeof(ProductValidator))]
         public IResult Add(Product product)//Result döndürecek RestFull api de
         {
+            //1. CleanCode spaggerri yöntem bir kategoride en fazla 10 ürün olabilir örneği
+            //var result = _productDal.GetAll(p => p.CategoryId == product.CategoryId).Count;
+            //if (result >= 10)
+            //{
+            //    return new ErrorResult(Messages.ProductCountOfCategoryError);
+            //}
+
+
+
             //business codes
             //validations
             //businness kodu ayrı validation kodu ayrı yapılmalı !!!
-
+            //iş kurallarını CleanCode olarak yazolmalı
 
             //1.kötü kod örneği
             //if (product.UnitPrice <= 0)
@@ -59,8 +82,43 @@ namespace Business.Concrete
             //3.Refactor edilmiş daha iyi kod örneği
             //ValidationTool.Validate(new ProductValidator(), product);
 
-            _productDal.Add(product);
+            //1.loglama örnegi 2. adımda LoggingAspect eklenmeli
+            //_logger.Log();
+            //try
+            //{
+            //    _productDal.Add(product);
 
+            //    return new SuccessResult(Messages.ProductAdded);
+            //}
+            //catch (Exception exception)
+            //{
+            //    _logger.Log();
+            //}
+            //return new ErrorResult();
+
+            //2.CleanCode örneği 
+            //if (CheckIfProductCountOfCategoryCorrect(product.CategoryId).Success)
+            //{
+            //    if (CheckIfSameProductNameExists(product.ProductName).Success)
+            //    {
+            //        _productDal.Add(product);
+
+            //        return new SuccessResult(Messages.ProductAdded);
+            //    }
+            //}
+            //return new ErrorResult();
+
+            //3. CleanCode refactored
+            IResult result = BusinessRules.Run(CheckIfProductCountOfCategoryCorrect(product.CategoryId), 
+                CheckIfSameProductNameExists(product.ProductName),
+                CheckIfCategoryLimitExceded());
+
+            if (result != null)
+            {
+                return result;
+            }
+
+            _productDal.Add(product);
             return new SuccessResult(Messages.ProductAdded);
         }
 
@@ -99,6 +157,54 @@ namespace Business.Concrete
                 return new ErrorDataResult<List<ProductDetailDto>>(Messages.MaintenanceTime);
             }
             return new SuccessDataResult<List<ProductDetailDto>>(_productDal.GetProductDetails());
+        }
+
+        [ValidationAspect(typeof(ProductValidator))]
+        public IResult Update(Product product)
+        {
+
+            if (CheckIfProductCountOfCategoryCorrect(product.CategoryId).Success)
+            {                
+                _productDal.Update(product);
+
+                return new SuccessResult(Messages.ProductUpdated);                             
+            }
+            return new ErrorResult();
+        }
+
+        //Bir kategoride 10 dan fazla ürün olamaz
+        private IResult CheckIfProductCountOfCategoryCorrect(int categoryId)
+        {
+            //arka planda çalışan kod //Bu örnekte Link kodu oluşur ve çalışır
+            //select count(*) from products where categoryId = 1
+            var result = _productDal.GetAll(p => p.CategoryId == categoryId).Count;
+            if (result >= 10)
+            {
+                return new ErrorResult(Messages.ProductCountOfCategoryError);
+            }
+            return new SuccessResult();
+        }
+
+        //Ayı isimde ürün eklenemez
+        private IResult CheckIfSameProductNameExists(string productName)
+        {
+            var result = _productDal.GetAll(p => p.ProductName == productName).Any();
+            if (result)
+            {
+                return new ErrorResult(Messages.ProductNameAlreadyExists);
+            }
+            return new SuccessResult();
+        }
+
+        //Eğer mevcur kategori sayısı 15 i geçti ise sisteme yeni ütün eklenemez
+        private IResult CheckIfCategoryLimitExceded()
+        {
+            var result = _categoryService.GetAll();
+            if (result.Data.Count >= 15)
+            {
+                return new ErrorResult(Messages.CaregoryLimitExcededError);
+            }
+            return new SuccessResult();
         }
     }
 }

@@ -1,9 +1,10 @@
 ﻿using Autofac;
 using Autofac.Extras.DynamicProxy;
 using Business.Abstract;
+using Business.CCS;
 using Business.Concrete;
 using Castle.DynamicProxy;
-using Core.Utilities.Interseptors;
+using Core.Utilities.Interceptors;
 using DataAccess.Abstract;
 using DataAccess.Concrete.EntityFramework;
 using System;
@@ -47,8 +48,14 @@ namespace Business.DependencyResolvers.Autofac
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<ProductManager>().As<IProductService>().SingleInstance();//Web Api deki karşılığı services.AddSingleton<IProductService, ProductManager>();
+            builder.RegisterType<ProductManager>().As<IProductService>().SingleInstance();//Web Api deki karşılığı services.AddSingleton<IProductService, ProductManager>();            
             builder.RegisterType<EFProductDal>().As<IProductDal>().SingleInstance();//Web Api deki karşılığı services.AddSingleton<IProductDal, EFProductDal>(); 
+
+            builder.RegisterType<CategoryManager>().As<ICategoryService>().SingleInstance();
+            builder.RegisterType<EfCategoryDal>().As<ICategoryDal>().SingleInstance();
+
+            builder.RegisterType<FileLogger>().As<ILogger>().SingleInstance();
+
 
             var assembly = System.Reflection.Assembly.GetExecutingAssembly();
 

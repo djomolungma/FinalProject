@@ -3,8 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Core.Utilities.Interseptors
+namespace Core.Utilities.Interceptors
 {
+    //Interception - araya girmek başa,sona,başarılı olduğunda,başarısız olduğunda
+    //invocation business da kullanılan method
     public abstract class MethodInterception : MethodInterceptionBaseAttribute
     {
         protected virtual void OnBefore(IInvocation invocation) { }
