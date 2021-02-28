@@ -1,5 +1,6 @@
 using Business.Abstract;
 using Business.Concrete;
+using Core.Utilities.IoC;
 using Core.Utilities.Security.Encription;
 using Core.Utilities.Security.JWT;
 using DataAccess.Abstract;
@@ -55,6 +56,7 @@ namespace WebAPI
                         IssuerSigningKey = SecurityKeyHelper.CreateSecurityKey(tokenOptions.SecurityKey)
                     };
                 });
+            ServiceTool.Create(services);
 
             //Buradaki IoC yerine Manage nuget packages'dan Business katmanýna Autofac ve Autofac.Extras
             //Autofac teknolojisini kuruyoruz "Autofac" ve "Autofac.Extras.DynamicProxy" yi kuruyoruz
