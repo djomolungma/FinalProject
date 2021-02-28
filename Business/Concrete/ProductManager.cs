@@ -1,4 +1,5 @@
 ﻿using Business.Abstract;
+using Business.BusinessAspects.Autofac;
 using Business.CCS;
 using Business.Constants;
 using Business.ValidationRules.FluentValidation;
@@ -39,6 +40,11 @@ namespace Business.Concrete
             _categoryService = categoryService;
         }
 
+        //Hashing - Geri dönüşünü olmayan şifreleme
+        //Encription - Geri dönüşü olan şifreleme; Decription - şifre çözme
+        //Slting - Kullanıcının girdiği parolayı biraz daha güçlendirmek
+        //Claim - admin veya editor yetkilerinden birine sahip olduğu iddaası
+        [SecuredOperation("product.add,admin")]
         //4.Refactor edilmiş son kod
         [ValidationAspect(typeof(ProductValidator))]
         public IResult Add(Product product)//Result döndürecek RestFull api de
