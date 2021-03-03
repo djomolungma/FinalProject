@@ -3,6 +3,9 @@ using Business.BusinessAspects.Autofac;
 using Business.CCS;
 using Business.Constants;
 using Business.ValidationRules.FluentValidation;
+using Core.Aspects.Autofac.Caching;
+using Core.Aspects.Autofac.Performance;
+using Core.Aspects.Autofac.Transaction;
 using Core.Aspects.Autofac.Validation;
 using Core.CrossCuttingConserns.Validation;
 using Core.Utilities.Business;
@@ -47,6 +50,7 @@ namespace Business.Concrete
         [SecuredOperation("product.add,admin")]
         //4.Refactor edilmiş son kod
         [ValidationAspect(typeof(ProductValidator))]
+        [CacheRemoveAspect("IProductService.Get")]
         public IResult Add(Product product)//Result döndürecek RestFull api de
         {
             //1. CleanCode spaggerri yöntem bir kategoride en fazla 10 ürün olabilir örneği
@@ -127,7 +131,9 @@ namespace Business.Concrete
             _productDal.Add(product);
             return new SuccessResult(Messages.ProductAdded);
         }
-
+        
+        [CacheAspect(duration: 10)] //key, value
+        [PerformanceAspect(5)]
         public IDataResult<List<Product>> GetAll()//DataResult döndürecek RestFull api de
         {
             //İş kodları
@@ -146,6 +152,8 @@ namespace Business.Concrete
             return new SuccessDataResult<List<Product>>(_productDal.GetAll(p=>p.CategoryId==id));
         }
 
+        [CacheAspect(duration: 10)] //key, value
+        [PerformanceAspect(5)]
         public IDataResult<Product> GetById(int productId)
         {
             return new SuccessDataResult<Product>(_productDal.Get(p=>p.ProductId == productId));
@@ -166,6 +174,7 @@ namespace Business.Concrete
         }
 
         [ValidationAspect(typeof(ProductValidator))]
+        [CacheRemoveAspect("IProductService.Get")]
         public IResult Update(Product product)
         {
 
@@ -211,6 +220,14 @@ namespace Business.Concrete
                 return new ErrorResult(Messages.CaregoryLimitExcededError);
             }
             return new SuccessResult();
+        }
+
+        [TransactionScopeAspect]
+        public IResult TransactionalOperation(Product product)
+        {            
+            _productDal.Add(product);//test
+            _productDal.Update(product);//test
+            return new SuccessResult(Messages.ProductUpdated);
         }
     }
 }

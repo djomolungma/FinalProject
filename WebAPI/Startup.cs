@@ -1,5 +1,7 @@
 using Business.Abstract;
 using Business.Concrete;
+using Core.DependencyResolvers;
+using Core.Extensions;
 using Core.Utilities.IoC;
 using Core.Utilities.Security.Encription;
 using Core.Utilities.Security.JWT;
@@ -39,6 +41,11 @@ namespace WebAPI
             
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
+            services.AddCors(OptionsBuilderConfigurationExtensions =>
+            {
+                OptionsBuilderConfigurationExtensions.AddPolicy("AllowOrigin", builder => builder.WithOrigins("http://localhost:3000"));
+            });
+
             var tokenOptions = Configuration.GetSection("TokenOptions").Get<TokenOptions>();
 
             //Microsoft.AspNetCore.Authentication.JwtBearer
@@ -56,7 +63,11 @@ namespace WebAPI
                         IssuerSigningKey = SecurityKeyHelper.CreateSecurityKey(tokenOptions.SecurityKey)
                     };
                 });
-            ServiceTool.Create(services);
+
+            //ServiceTool.Create(services); //bu satýrýn yerine daha fonksiyonel bir geliþtirme yaptým
+            services.AddDependencyResolvers(new ICoreModel[] { 
+                new CoreModule()
+            });
 
             //Buradaki IoC yerine Manage nuget packages'dan Business katmanýna Autofac ve Autofac.Extras
             //Autofac teknolojisini kuruyoruz "Autofac" ve "Autofac.Extras.DynamicProxy" yi kuruyoruz
@@ -88,12 +99,12 @@ namespace WebAPI
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseCors(builder => builder.WithOrigins("http://localhost:3000").AllowAnyHeader());//Biz ektedik güvenlik için AllowAnyHeader() GET,POST,PUT
             app.UseHttpsRedirection();
 
-            app.UseRouting();
-
+            app.UseRouting();            
+            
             app.UseAuthentication();//Biz ektedik yetkilenditme için
-
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
