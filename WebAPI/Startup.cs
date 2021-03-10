@@ -46,6 +46,7 @@ namespace WebAPI
                 OptionsBuilderConfigurationExtensions.AddPolicy("AllowOrigin", builder => builder.WithOrigins("http://localhost:3000"));
             });
 
+            services.AddCors();
             var tokenOptions = Configuration.GetSection("TokenOptions").Get<TokenOptions>();
 
             //Microsoft.AspNetCore.Authentication.JwtBearer
@@ -99,7 +100,7 @@ namespace WebAPI
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseCors(builder => builder.WithOrigins("http://localhost:3000").AllowAnyHeader());//Biz ektedik güvenlik için AllowAnyHeader() GET,POST,PUT
+            app.UseCors(builder => builder.WithOrigins("http://localhost:4200", "http://localhost:4201").AllowAnyHeader());//Biz ektedik güvenlik için AllowAnyHeader() GET,POST,PUT istekleri //adamý biliyorum ve güveniyorum
             app.UseHttpsRedirection();
 
             app.UseRouting();            

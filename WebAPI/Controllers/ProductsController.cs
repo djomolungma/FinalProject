@@ -46,7 +46,7 @@ namespace WebAPI.Controllers
             var result = _productService.GetAll();
             if (result.Success)
             {
-                return Ok(result.Data);//Ok() Message:200 //Created() Message:201
+                return Ok(result);//Ok() Message:200 //Created() Message:201
             }
             else return BadRequest(result.Message);//Badrequest() Message:400
         }
