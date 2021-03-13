@@ -229,5 +229,10 @@ namespace Business.Concrete
             _productDal.Update(product);//test
             return new SuccessResult(Messages.ProductUpdated);
         }
+
+        //public IDataResult<List<Product>> GetByCategoryId(int categoryId)
+        //{
+        //    throw new NotImplementedException();
+        //}
     }
 }

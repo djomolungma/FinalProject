@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace WebAPI.Controllers
@@ -42,19 +43,32 @@ namespace WebAPI.Controllers
         public IActionResult GetAll()
         {
             //Hazır dökümantasyon sunan ürünlere örnek Swagger
-            //Dependancy chain --            
+            //Dependancy chain --
+            //
+            //Thread.Sleep(5000);
             var result = _productService.GetAll();
             if (result.Success)
             {
                 return Ok(result);//Ok() Message:200 //Created() Message:201
             }
-            else return BadRequest(result.Message);//Badrequest() Message:400
+            else return BadRequest(result);//Badrequest() Message:400
         }
 
         [HttpGet("getbyid")]
         public IActionResult GetById(int id)
         {
             var result = _productService.GetById(id);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            else return BadRequest(result);
+        }
+
+        [HttpGet("getbycategory")]
+        public IActionResult GetByCategory(int categoryId)
+        {
+            var result = _productService.GetAllByCategoryId(categoryId);
             if (result.Success)
             {
                 return Ok(result);

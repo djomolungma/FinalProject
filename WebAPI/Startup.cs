@@ -46,7 +46,7 @@ namespace WebAPI
                 OptionsBuilderConfigurationExtensions.AddPolicy("AllowOrigin", builder => builder.WithOrigins("http://localhost:3000"));
             });
 
-            services.AddCors();
+            services.AddCors();//api ye dýþarýdan eriþim saðlanabilmesi için gerekli ; nereden eriþilebilecegini belirliyoruz Configure içerisine bak
             var tokenOptions = Configuration.GetSection("TokenOptions").Get<TokenOptions>();
 
             //Microsoft.AspNetCore.Authentication.JwtBearer
