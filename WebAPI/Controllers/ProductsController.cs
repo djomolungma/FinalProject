@@ -85,7 +85,7 @@ namespace WebAPI.Controllers
             {
                 return Ok(result);
             }
-            else return BadRequest(result.Message);
+            else return BadRequest(result);
         }
     }
 }

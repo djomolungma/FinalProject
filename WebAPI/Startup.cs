@@ -99,11 +99,12 @@ namespace WebAPI
             {
                 app.UseDeveloperExceptionPage();
             }
+            app.ConfigureCustomExceptionMiddleware();//Custome added middleware
 
             app.UseCors(builder => builder.WithOrigins("http://localhost:4200", "http://localhost:4201").AllowAnyHeader());//Biz ektedik güvenlik için AllowAnyHeader() GET,POST,PUT istekleri //adamý biliyorum ve güveniyorum
             app.UseHttpsRedirection();
 
-            app.UseRouting();            
+            app.UseRouting();
             
             app.UseAuthentication();//Biz ektedik yetkilenditme için
             app.UseAuthorization();
