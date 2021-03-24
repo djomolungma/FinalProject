@@ -47,7 +47,7 @@ namespace Business.Concrete
         //Encription - Geri dönüşü olan şifreleme; Decription - şifre çözme
         //Slting - Kullanıcının girdiği parolayı biraz daha güçlendirmek
         //Claim - admin veya editor yetkilerinden birine sahip olduğu iddaası
-        //[SecuredOperation("product.add,admin")]
+        [SecuredOperation("product.add,admin")]
         //4.Refactor edilmiş son kod
         [ValidationAspect(typeof(ProductValidator))]
         [CacheRemoveAspect("IProductService.Get")]
